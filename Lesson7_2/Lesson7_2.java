@@ -21,6 +21,7 @@ public class Lesson7_2 {
         File file = new File("D:\\Class");
         String[] fileList = file.list();
         Class<?> classToAnalyze;
+//просматриваем заранее заданную папку на предмет файлов с расширением типа class
         if (fileList!=null) {
             for (String str : fileList) {
                 out.println(str);
@@ -28,6 +29,7 @@ public class Lesson7_2 {
                 if ( !array[1].equalsIgnoreCase("class") ) {
                     throw new RuntimeException(str, new Exception());
                 }
+//загружаем в память найденный класс
                 classToAnalyze = URLClassLoader.newInstance(new URL[]
                         {file.toURI().toURL()}).
                         loadClass(array[0]);
@@ -37,6 +39,8 @@ public class Lesson7_2 {
     }
 
     private static void getMethods(Class<?> classToAnalyze) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+//создаем список методов этого класса
+//в данном случае нас интересуют методы, возвращающие значение (опционально)
         Method[] methods = classToAnalyze.getDeclaredMethods();
         List<Method> arrayOfMethods = new ArrayList<>();
         out.println("Список методов, возвращающих значение:");
@@ -54,11 +58,14 @@ public class Lesson7_2 {
 
     private static void checkMethods(List<Method> methods, Class<?> classToAnalyze) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         out.println("Проверка методов");
-
+//создаем конструктор класса, он будет использоваться в методе invoke ниже
         Constructor<?> constructor = classToAnalyze.getConstructor();
         Object object = constructor.newInstance();
+//создаем список проверяемых параметров для метода invoke,
+//они все будут разного типа, поэтому обозначаем все как Object
         ArrayList<Object> parameters = new ArrayList<>();
-
+//проверяем на наличие маркеров-переменных, в данном случае int и float
+//создаем массив аргументов для getDeclaredMethod
         for (int i = 0; i < methods.size(); i++) {
             Class<?>[] classArguments = new Class[methods.get(i).getParameterTypes().length];
             for (int j = 0; j < methods.get(i).getParameterTypes().length; j++) {
@@ -81,6 +88,7 @@ public class Lesson7_2 {
                     methods.get(i).invoke(object, parameters.toArray()),
                     parameters);
             parameters.clear();
+//очищаем каждый раз список параметров, чтобы использовать в следующем методе
         }
     }
 
